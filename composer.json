@@ -1,0 +1,33 @@
+{
+  "name": "lyz/wechat-sdk",
+  "description": "WeChat platform development tools",
+  "type": "library",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "lyz",
+      "email": "lyzx952@163.com"
+    }
+  ],
+  "keywords": [
+    "WeChat",
+    "WeMini"
+  ],
+  "require": {
+    "php": ">=7.1.2",
+    "ext-curl": "*",
+    "ext-xml": "*",
+    "ext-json": "*",
+    "ext-bcmath": "*",
+    "ext-libxml": "*",
+    "ext-openssl": "*",
+    "ext-mbstring": "*",
+    "ext-simplexml": "*"
+  },
+  "autoload": {
+    "psr-4": {
+      "Lyz\\WeChat\\": "WeChat/src/",
+      "Lyz\\WeMini\\": "WeMini/src/"
+    }
+  }
+}
