@@ -6,7 +6,6 @@ use Lyz\WeChat\Exceptions\InvalidResponseException;
 
 /**
  * Class Curl
- * A basic CURL wrapper
  * @package Lyz\WeChat\Utils
  */
 class Curl

@@ -3,8 +3,8 @@
 namespace Lyz\WeChat\Exceptions;
 
 /**
- * Class InvalidResponseException
  * 返回异常
+ * Class InvalidResponseException
  * @package Lyz\WeChat\Exceptions
  */
 class InvalidResponseException extends \Exception

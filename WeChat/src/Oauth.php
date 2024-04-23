@@ -5,8 +5,8 @@ namespace Lyz\WeChat;
 use Lyz\WeChat\contracts\BasicWeChat;
 
 /**
- * Class Oauth
  * 微信网页授权
+ * Class Oauth
  * @package Lyz\WeChat
  */
 class Oauth extends BasicWeChat

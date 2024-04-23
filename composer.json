@@ -22,7 +22,8 @@
     "ext-libxml": "*",
     "ext-openssl": "*",
     "ext-mbstring": "*",
-    "ext-simplexml": "*"
+    "ext-simplexml": "*",
+    "lyz/x-tool": "^0.0.1"
   },
   "autoload": {
     "psr-4": {

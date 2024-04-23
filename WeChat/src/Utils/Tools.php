@@ -114,7 +114,7 @@ class Tools
     /**
      * 检查回调函数是否有用
      * 
-     * @param array $callback [类, 函数名] 如类不是实例化，则函数必须是静态函数
+     * @param array $callback [类, 静态函数名]
      * @return boolean
      */
     public static function checkCallback($callback)

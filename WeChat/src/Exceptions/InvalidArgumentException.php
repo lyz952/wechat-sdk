@@ -3,8 +3,8 @@
 namespace Lyz\WeChat\Exceptions;
 
 /**
- * Class InvalidArgumentException
  * 接口参数异常
+ * Class InvalidArgumentException
  * @package Lyz\WeChat\Exceptions
  */
 class InvalidArgumentException extends \InvalidArgumentException

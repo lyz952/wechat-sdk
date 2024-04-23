@@ -5,8 +5,8 @@ namespace Lyz\WeChat;
 use Lyz\WeChat\contracts\BasicPushEvent;
 
 /**
- * Class Receive
  * 公众号推送管理
+ * Class Receive
  * @package Lyz\WeChat
  */
 class Receive extends BasicPushEvent

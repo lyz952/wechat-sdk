@@ -9,8 +9,8 @@ use Lyz\WeChat\Exceptions\InvalidArgumentException;
 use Lyz\WeChat\Exceptions\InvalidResponseException;
 
 /**
- * Class BasicPushEvent
  * 微信通知处理基本类
+ * Class BasicPushEvent
  * @package Lyz\WeChat\contracts
  */
 class BasicPushEvent

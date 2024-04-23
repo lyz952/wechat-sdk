@@ -3,8 +3,8 @@
 namespace Lyz\WeChat\Exceptions;
 
 /**
- * Class InvalidDecryptException
  * 加密解密异常
+ * Class InvalidDecryptException
  * @package Lyz\WeChat\Exceptions
  */
 class InvalidDecryptException extends \Exception

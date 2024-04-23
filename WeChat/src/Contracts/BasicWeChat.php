@@ -44,7 +44,7 @@ class BasicWeChat
         if (empty($options['appId'])) {
             throw new InvalidArgumentException("Missing Config -- [appId]");
         }
-        $this->appId = $options['appid'];
+        $this->appId = $options['appId'];
 
         if (empty($options['appSecret'])) {
             throw new InvalidArgumentException("Missing Config -- [appSecret]");

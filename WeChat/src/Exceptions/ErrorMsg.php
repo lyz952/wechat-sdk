@@ -3,8 +3,8 @@
 namespace Lyz\WeChat\Exceptions;
 
 /**
- * Class ErrorMsg
  * 错误提示类
+ * Class ErrorMsg
  * @package Lyz\WeChat\Exceptions
  */
 class ErrorMsg
