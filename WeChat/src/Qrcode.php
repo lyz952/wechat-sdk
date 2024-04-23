@@ -2,6 +2,7 @@
 
 namespace Lyz\WeChat;
 
+use Lyz\WeChat\Utils\Tools;
 use Lyz\WeChat\contracts\BasicWeChat;
 use Lyz\WeChat\Doc\CreateQrcodeResponse;
 
@@ -47,7 +48,7 @@ class Qrcode extends BasicWeChat
             $data['action_name'] = is_integer($scene) ? 'QR_LIMIT_SCENE' : 'QR_LIMIT_STR_SCENE';
         }
 
-        return CreateQrcodeResponse::create($this->callPostApi($url, $data));
+        return CreateQrcodeResponse::create(Tools::json2arr($this->callPostApi($url, $data)));
     }
 
     /**

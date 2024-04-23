@@ -152,6 +152,6 @@ class BasicWeChat
 
         $curl = new Curl();
         $curl->setHeader('Content-Type', 'application/json');
-        return Tools::json2arr($curl->post($url, Tools::arr2json($data)));
+        return $curl->post($url, Tools::arr2json($data));
     }
 }
