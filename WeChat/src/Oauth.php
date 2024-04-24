@@ -28,7 +28,7 @@ class Oauth extends BasicWeChat
     /**
      * 通过 code 获取 AccessToken 和 openid
      * 
-     * @param string $code 授权Code值，不传则取GET参数
+     * @param string $code 授权 Code 值，不传则取GET参数
      * @return array
      * @throws \Lyz\WeChat\Exceptions\InvalidResponseException
      */

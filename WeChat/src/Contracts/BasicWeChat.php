@@ -44,16 +44,29 @@ class BasicWeChat
         if (empty($options['appId'])) {
             throw new InvalidArgumentException("Missing Config -- [appId]");
         }
-        $this->appId = $options['appId'];
-
         if (empty($options['appSecret'])) {
             throw new InvalidArgumentException("Missing Config -- [appSecret]");
         }
+        $this->appId = $options['appId'];
         $this->appSecret = $options['appSecret'];
 
         if (isset($options['GetAccessTokenCallback']) && Tools::checkCallback($options['GetAccessTokenCallback'])) {
             $this->GetAccessTokenCallback = $options['GetAccessTokenCallback'];
         }
+    }
+
+    /**
+     * 获取当前配置
+     *
+     * @return array
+     */
+    public function getConfig()
+    {
+        return [
+            'appId' => $this->appId,
+            'appSecret' => $this->appSecret,
+            'GetAccessTokenCallback' => $this->GetAccessTokenCallback,
+        ];
     }
 
     /**
@@ -132,8 +145,6 @@ class BasicWeChat
      */
     public function callGetApi($url)
     {
-        $this->registerApi($url);
-
         $curl = new Curl();
         return Tools::json2arr($curl->get($url));
     }
@@ -148,10 +159,8 @@ class BasicWeChat
      */
     public function callPostApi($url, $data)
     {
-        $this->registerApi($url);
-
         $curl = new Curl();
         $curl->setHeader('Content-Type', 'application/json');
-        return $curl->post($url, Tools::arr2json($data));
+        return Tools::json2arr($curl->post($url, Tools::arr2json($data)));
     }
 }

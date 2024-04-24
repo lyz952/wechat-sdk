@@ -2,10 +2,10 @@
 
 namespace Lyz\WeMini;
 
-use Lyz\WeChat\Utils\Tools;
 use Lyz\WeChat\contracts\BasicWeChat;
-use Lyz\WeChat\Exceptions\ErrorMsg;
 use Lyz\WeChat\Exceptions\InvalidResponseException;
+use Lyz\WeChat\Utils\Curl;
+use Lyz\WeChat\Utils\Tools;
 
 /**
  * 微信小程序二维码
@@ -36,6 +36,7 @@ class Qrcode extends BasicWeChat
     public function createMiniScene($scene, $page = '', $width = 430, $autoColor = false, $lineColor = null, $isHyaline = true)
     {
         $url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=ACCESS_TOKEN';
+        $this->registerApi($url);
 
         $lineColor = empty($lineColor) ? $this->lineColor : $lineColor;
         $data = [
@@ -50,11 +51,12 @@ class Qrcode extends BasicWeChat
         ];
         if (empty($page)) unset($data['page']);
 
-        return $this->parseResult($this->callPostApi($url, $data));
+        return $this->parseResult((new Curl())->post($url, Tools::arr2json($data)));
     }
 
     /**
      * 解释接口数据
+     * 
      * @param string $result
      * @return array|mixed
      * @throws \Lyz\WeChat\Exceptions\InvalidResponseException
@@ -62,9 +64,6 @@ class Qrcode extends BasicWeChat
     private function parseResult($result)
     {
         if (is_array($json = json_decode($result, true))) {
-            if (isset($json['errcode']) && in_array($json['errcode'], ['40014', '40001', '41001', '42001'])) {
-                throw new InvalidResponseException(ErrorMsg::toMessage($json['errcode']), $json['errcode']);
-            }
             return Tools::json2arr($result);
         } else {
             return $result;

@@ -38,10 +38,10 @@ class Tools
     {
         $result = json_decode($json, true);
         if (empty($result)) {
-            throw new InvalidResponseException('invalid response.', ErrorMsg::ERROR_SYSTEM, [$json]);
+            throw new InvalidResponseException('invalid response.', ErrorMsg::ERROR_SYSTEM);
         }
         if (!empty($result['errcode'])) {
-            throw new InvalidResponseException(ErrorMsg::toMessage($result['errcode'], $result['errmsg']), $result['errcode'], $result);
+            throw new InvalidResponseException($result['errmsg'], $result['errcode'], $result);
         }
         return $result;
     }

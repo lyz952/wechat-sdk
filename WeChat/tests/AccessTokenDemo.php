@@ -15,7 +15,7 @@ class AccessTokenDemo
     }
 
     /**
-     * 公共获取 AccessToken
+     * 外部获取 AccessToken
      * 
      * @return string
      */
@@ -26,12 +26,13 @@ class AccessTokenDemo
         $config = $config['wechat'];
         // 注册代替函数
         $config['GetAccessTokenCallback'] = [AccessTokenDemo::class, 'getAccessTokenCallback'];
-        return self::getAccessTokenCallback(new BasicWeChat($config));
+        return (new BasicWeChat($config))->getAccessToken();
     }
 
     /**
      * AccessToken 代替函数
      *
+     * @param \Lyz\WeChat\contracts\BasicWeChat $wechat
      * @return string
      */
     public static function getAccessTokenCallback(BasicWeChat $wechat)
@@ -45,10 +46,13 @@ class AccessTokenDemo
             return 'AccessToken';
         } else {
             // 过期重新获取 token
-            $config = [
-                'appId' => $wechat->appId,
-                'appSecret' => $wechat->appSecret,
-            ];
+            // $config = [
+            //     'appId' => $wechat->appId,
+            //     'appSecret' => $wechat->appSecret,
+            // ];
+
+            $config = $wechat->getConfig();
+            unset($config['GetAccessTokenCallback']);
             $token = (new BasicWeChat($config))->getAccessToken();
 
             // 更新本地存储的 token 
