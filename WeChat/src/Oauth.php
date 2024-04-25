@@ -15,12 +15,17 @@ class Oauth extends BasicWeChat
      * Oauth 授权跳转接口
      * 
      * @param string $redirect_url 授权回跳地址
-     * @param string $state 为重定向后会带上state参数（填写a-zA-Z0-9的参数值，最多128字节）
-     * @param string $scope 授权类类型(可选值snsapi_base|snsapi_userinfo)
+     * @param string $state 重定向后会带上state参数，可以填写a-zA-Z0-9的参数值，最多128字节
+     * @param string $scope 应用授权作用域(可选值snsapi_base|snsapi_userinfo)
      * @return string
      */
     public function getOauthRedirect($redirect_url, $state = '', $scope = 'snsapi_base')
     {
+        /*
+            scope:
+                snsapi_base: 不弹出授权页面，直接跳转，只能获取用户openid
+                snsapi_userinfo: 弹出授权页面，可通过openid拿到昵称、性别、所在地。并且，即使在未关注的情况下，只要用户授权，也能获取其信息 
+         */
         $redirect_uri = urlencode($redirect_url);
         return "https://open.weixin.qq.com/connect/oauth2/authorize?appid={$this->appId}&redirect_uri={$redirect_uri}&response_type=code&scope={$scope}&state={$state}#wechat_redirect";
     }
