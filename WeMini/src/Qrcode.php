@@ -2,10 +2,9 @@
 
 namespace Lyz\WeMini;
 
-use Lyz\WeChat\contracts\BasicWeChat;
-use Lyz\WeChat\Exceptions\InvalidResponseException;
 use Lyz\WeChat\Utils\Curl;
 use Lyz\WeChat\Utils\Tools;
+use Lyz\WeChat\contracts\BasicWeChat;
 
 /**
  * 微信小程序二维码

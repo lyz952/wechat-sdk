@@ -30,13 +30,10 @@ class Curl
      */
     private $headers = array();
 
-    // /**
-    //  * @var array 与请求一起发送的 CURLOPT 选项的关联数组
-    //  */
-    // protected $options = array();
-
     /**
      * 初始化 Curl 对象
+     * 
+     * @throws \ErrorException
      */
     public function __construct()
     {
@@ -95,9 +92,7 @@ class Curl
         }
 
         $success = curl_setopt($this->ch, $option, $value);
-        if ($success) {
-            // $this->options[$option] = $value;
-        }
+
         return $success;
     }
 
@@ -116,17 +111,6 @@ class Curl
         }
         return true;
     }
-
-    // /**
-    //  * 获取已经设置的 CURLOPT 选项的值
-    //  *
-    //  * @param int $option
-    //  * @return mixed
-    //  */
-    // public function getOpt($option)
-    // {
-    //     return isset($this->options[$option]) ? $this->options[$option] : null;
-    // }
 
     /**
      * 设置请求头
@@ -173,7 +157,7 @@ class Curl
         $this->setUrl($url);
 
         $this->setOpt(CURLOPT_POST, true);
-        $this->setOpt(CURLOPT_POSTFIELDS, self::_buildPostData($data));
+        $this->setOpt(CURLOPT_POSTFIELDS, Tools::arr2json($data));
 
         return $this->exec();
     }
@@ -201,31 +185,6 @@ class Curl
             throw new InvalidResponseException($errorMessage);
         }
 
-        // CURLOPT_HEADER 为 true 时使用下面方法提取数据
-        // // headers 正则表达式
-        // $pattern = '#HTTP/\d\.\d.*?$.*?\r\n\r\n#ims';
-
-        // // 从响应中提取 headers
-        // preg_match_all($pattern, $response, $matches);
-        // $headers_string = array_pop($matches[0]);
-        // $headers = explode("\r\n", str_replace("\r\n\r\n", '', $headers_string));
-
-        // // 从响应正文中删除 headers
-        // $body = str_replace($headers_string, '', $response);
-
-        // // 从第一个 headers 中提取版本和状态
-        // $version_and_status = array_shift($headers);
-        // preg_match('#HTTP/(\d\.\d)\s(\d\d\d)\s(.*)#', $version_and_status, $matches);
-        // $headers['Http-Version'] = $matches[1];
-        // $headers['Status-Code'] = $matches[2];
-        // $headers['Status'] = $matches[2] . ' ' . $matches[3];
-
-        // // headers 转换为关联数组
-        // foreach ($headers as $header) {
-        //     preg_match('#(.*?)\:\s(.*)#', $header, $matches);
-        //     $headers[$matches[1]] = $matches[2];
-        // }
-
         $this->close();
 
         return $response;
@@ -243,89 +202,5 @@ class Curl
         }
 
         $this->ch = null;
-        // $this->options = null;
     }
-
-    /**
-     * POST 数据过滤处理
-     * 
-     * @param array $data
-     * @return string
-     */
-    private static function _buildPostData($data)
-    {
-        if (!is_array($data)) return $data;
-
-        return Tools::arr2json($data);
-    }
-
-    // /**
-    //  * Set Headers
-    //  *
-    //  * @param string[] $headers
-    //  */
-    // public function setHeaders($headers)
-    // {
-    //     foreach ($headers as $header) {
-    //         list($key, $value) = explode(':', $header, 2);
-    //         $key = trim($key);
-    //         $value = trim($value);
-    //         $this->headers[$key] = $value;
-    //     }
-
-    //     $headers = [];
-    //     foreach ($this->headers as $key => $value) {
-    //         $headers[] = $key . ': ' . $value;
-    //     }
-
-    //     $this->setOpt(CURLOPT_HTTPHEADER, $headers);
-    // }
-
-    // /**
-    //  * 从请求中删除内部标头
-    //  * Using `curl -H "Host:" ...' is equivalent to $ch->removeHeader('Host');.
-    //  *
-    //  * @access public
-    //  * @param  $key
-    //  */
-    // public function removeHeader($key)
-    // {
-    //     $this->setHeader($key, '');
-    // }
-
-    // /**
-    //  * 设置证书文件
-    //  *
-    //  * @param [type] $ssl_key
-    //  * @return void
-    //  */
-    // public function setSslKey($ssl_key)
-    // {
-    //     if (!file_exists($ssl_key)) {
-    //         throw new InvalidArgumentException("Certificate files that do not exist. --- [ssl_key]");
-    //     }
-
-    //     curl_setopt($this->ch, CURLOPT_SSLKEYTYPE, 'PEM');
-    //     curl_setopt($this->ch, CURLOPT_SSLKEY, $ssl_key);
-
-    //     return $this;
-    // }
-
-    // /**
-    //  * 设置证书文件
-    //  *
-    //  * @param [type] $ssl_cer
-    //  * @return void
-    //  */
-    // public function setSslCer($ssl_cer)
-    // {
-    //     if (!file_exists($ssl_cer)) {
-    //         throw new InvalidArgumentException("Certificate files that do not exist. --- [ssl_cer]");
-    //     }
-
-    //     curl_setopt($this->ch, CURLOPT_SSLCERTTYPE, 'PEM');
-    //     curl_setopt($this->ch, CURLOPT_SSLCERT, $ssl_cer);
-
-    //     return $this;
-    // }
 }

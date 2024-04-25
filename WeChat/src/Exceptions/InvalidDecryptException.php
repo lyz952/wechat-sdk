@@ -15,10 +15,11 @@ class InvalidDecryptException extends \Exception
     public $raw = [];
 
     /**
-     * InvalidDecryptException constructor.
-     * @param string $message
+     * constructor.
+     * 
+     * @param string  $message
      * @param integer $code
-     * @param array $raw
+     * @param array   $raw
      */
     public function __construct($message, $code = 0, $raw = [])
     {

@@ -2,7 +2,6 @@
 
 namespace Lyz\WeChat\Utils;
 
-use Lyz\WeChat\Exceptions\ErrorMsg;
 use Lyz\WeChat\Exceptions\InvalidResponseException;
 
 /**
@@ -11,22 +10,6 @@ use Lyz\WeChat\Exceptions\InvalidResponseException;
  */
 class Tools
 {
-    // /**
-    //  * 创建随机字符串
-    //  * 
-    //  * @param int    $length 字符长度
-    //  * @param string $str    前缀
-    //  * @return string
-    //  */
-    // public static function createNoncestr($length = 32, $str = "")
-    // {
-    //     $chars = "abcdefghijklmnopqrstuvwxyz0123456789";
-    //     for ($i = 0; $i < $length; $i++) {
-    //         $str .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
-    //     }
-    //     return $str;
-    // }
-
     /**
      * 解析 JSON 内容到数组
      * 
@@ -38,7 +21,7 @@ class Tools
     {
         $result = json_decode($json, true);
         if (empty($result)) {
-            throw new InvalidResponseException('invalid response.', ErrorMsg::ERROR_SYSTEM);
+            throw new InvalidResponseException('invalid response.');
         }
         if (!empty($result['errcode'])) {
             throw new InvalidResponseException($result['errmsg'], $result['errcode'], $result);
@@ -90,7 +73,7 @@ class Tools
     /**
      * XML内容生成
      * 
-     * @param array  $data 数据
+     * @param array $data 数据
      * @param string $content
      * @return string
      */

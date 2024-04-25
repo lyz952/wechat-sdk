@@ -4,7 +4,6 @@ namespace Lyz\WeChat\contracts;
 
 use Lyz\WeChat\Utils\Tools;
 use Lyz\WeChat\Aes\Prpcrypt;
-use Lyz\WeChat\Exceptions\InvalidDecryptException;
 use Lyz\WeChat\Exceptions\InvalidArgumentException;
 use Lyz\WeChat\Exceptions\InvalidResponseException;
 
@@ -64,21 +63,23 @@ class BasicPushEvent
      * constructor.
      * 
      * @param array $options
-     * @throws InvalidResponseException
+     * @throws \Lyz\WeChat\Exceptions\InvalidDecryptException
+     * @throws \Lyz\WeChat\Exceptions\InvalidArgumentException
+     * @throws \Lyz\WeChat\Exceptions\InvalidResponseException
      */
     public function __construct(array $options)
     {
         if (empty($options['appId'])) {
             throw new InvalidArgumentException("Missing Config -- [appId]");
         }
-        $this->appId = $options['appId'];
         if (empty($options['appSecret'])) {
             throw new InvalidArgumentException("Missing Config -- [appSecret]");
         }
-        $this->appSecret = $options['appSecret'];
         if (empty($options['token'])) {
             throw new InvalidArgumentException("Missing Config -- [token]");
         }
+        $this->appId = $options['appId'];
+        $this->appSecret = $options['appSecret'];
         $this->token = $options['token'];
 
         // 参数初始化
@@ -86,7 +87,7 @@ class BasicPushEvent
 
         // 推送消息处理
         if ($_SERVER['REQUEST_METHOD'] == "POST") {
-            $this->postxml = file_get_contents("php://input");
+            $this->postxml = file_get_contents("php://input"); // 获取原始 POST 数据
             $this->encryptType = $this->input->get('encrypt_type');
             if ($this->isEncrypt()) {
                 if (empty($options['encodingAESKey'])) {
@@ -97,10 +98,7 @@ class BasicPushEvent
                 $prpcrypt = new Prpcrypt($this->encodingAESKey);
                 $result = Tools::xml2arr($this->postxml);
                 $array = $prpcrypt->decrypt($result['Encrypt']);
-                if (intval($array[0]) > 0) {
-                    throw new InvalidResponseException($array[1], $array[0]);
-                }
-                list($this->postxml, $this->appId) = [$array[1], $array[2]];
+                list($this->postxml, $this->appId) = [$array[0], $array[1]];
             }
             $this->receive = new DataArray(Tools::xml2arr($this->postxml));
         } elseif ($_SERVER['REQUEST_METHOD'] == "GET" && $this->checkSignature()) {
@@ -108,7 +106,7 @@ class BasicPushEvent
             @ob_clean();
             exit($this->input->get('echostr'));
         } else {
-            throw new InvalidResponseException('Invalid interface request.', '0');
+            throw new InvalidResponseException('Invalid interface request.');
         }
     }
 
@@ -125,23 +123,17 @@ class BasicPushEvent
     /**
      * 回复消息
      * 
-     * @param array   $data 消息内容
-     * @param boolean $return 是否返回XML内容
-     * @param boolean $isEncrypt 是否加密内容
+     * @param array $data 消息内容
      * @return string
      * @throws \Lyz\WeChat\Exceptions\InvalidDecryptException
      */
-    public function reply(array $data = [], $return = false, $isEncrypt = false)
+    public function reply(array $data = [])
     {
         $xml = Tools::arr2xml(empty($data) ? $this->message : $data);
-        if ($this->isEncrypt() || $isEncrypt) {
-            if (!class_exists('Prpcrypt', false)) {
-                require __DIR__ . '/Prpcrypt.php';
-            }
+        if ($this->isEncrypt()) {
             $prpcrypt = new Prpcrypt($this->encodingAESKey);
-            $array = $prpcrypt->encrypt($xml, $this->appId);
-            if ($array[0] > 0) throw new InvalidDecryptException('Encrypt Error.', '0');
-            list($timestamp, $encrypt) = [time(), $array[1]];
+            $encrypt = $prpcrypt->encrypt($xml, $this->appId);
+            $timestamp = time();
             $nonce = rand(77, 999) * rand(605, 888) * rand(11, 99);
             $tmpArr = [$this->token, $timestamp, $nonce, $encrypt];
             sort($tmpArr, SORT_STRING);
@@ -149,7 +141,6 @@ class BasicPushEvent
             $format = "<xml><Encrypt><![CDATA[%s]]></Encrypt><MsgSignature><![CDATA[%s]]></MsgSignature><TimeStamp>%s</TimeStamp><Nonce><![CDATA[%s]]></Nonce></xml>";
             $xml = sprintf($format, $encrypt, $signature, $timestamp, $nonce);
         }
-        if ($return) return $xml;
         @ob_clean();
         echo $xml;
     }

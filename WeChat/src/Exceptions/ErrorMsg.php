@@ -9,28 +9,20 @@ namespace Lyz\WeChat\Exceptions;
  */
 class ErrorMsg
 {
-	// ------------- 系统错误相关--101到200 -------------
-	const ERROR_SYSTEM = 101; // 系统错误
-	const ERROR_NEWS_ITEM_COUNT_MORE_TEN = 102; // 图文消息的项数超过10
-	const ERROR_MENU_CLICK = 103; // 微信这个坑爹货，菜单跳转失败，请重试。
+	/**
+	 * 系统错误
+	 */
+	const ERROR_SYSTEM = 101;
 
-	// ------------- 用户输入相关--1001到1100 -------------
-	const ERROR_INPUT_ERROR = 1001; // 输入有误，请重新输入
-	const ERROR_UNKNOW_TYPE = 1002; // 收到了未知类型的消息
-	const ERROR_CAPTCHA_ERROR = 1003; // 验证码错误
-	const ERROR_REQUIRED_FIELDS = 1004; // 必填项未填写全
+	/**
+	 * 获取 ACCESS_TOKEN 失败
+	 */
+	const ERROR_GET_ACCESS_TOKEN = 1202;
 
-	// ------------- 远程调用相关--1201到1300 -------------
-	const ERROR_REMOTE_SERVER_NOT_RESPOND = 1201; // 远程服务器未响应
-	const ERROR_GET_ACCESS_TOKEN = 1202; // 获取 ACCESS_TOKEN 失败
-
-	// ------------- 文章管理相关--1301到1400 -------------
-
-	// ------------- 分类管理相关--1401到1500 -------------
-	const ERROR_MENU_NOT_EXISTS = 1401; // 菜单不存在
-
-	// ------------- 文案类 -------------
-	const ERROR_NO_BINDING_TEXT = '对不起，您尚未绑定微信，轻松绑定微信，即可查询实时流量，享受便捷服务!'; // 未绑定微信时错误文案
+	/**
+	 * 参数缺失
+	 */
+	const ERROR_MISSING_PARAMS = 40097;
 
 	/**
 	 * @var array 微信接口代码错误
@@ -198,7 +190,6 @@ class ErrorMsg
 		9001036 => '查询起始值 begin 不合法',
 
 		// 自定义
-		self::ERROR_SYSTEM => '系统错误',
 		self::ERROR_GET_ACCESS_TOKEN => '获取 ACCESS_TOKEN 失败',
 	];
 

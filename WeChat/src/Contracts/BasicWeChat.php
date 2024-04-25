@@ -38,6 +38,7 @@ class BasicWeChat
      * 构造函数
      * 
      * @param array $options
+     * @throws \Lyz\WeChat\Exceptions\InvalidArgumentException
      */
     public function __construct(array $options)
     {

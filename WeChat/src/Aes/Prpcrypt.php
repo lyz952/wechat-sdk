@@ -28,7 +28,8 @@ class Prpcrypt
      * 
      * @param string $text  需要加密的明文
      * @param string $appid 公众号APPID
-     * @return array
+     * @return string
+     * @throws \Lyz\WeChat\Exceptions\InvalidDecryptException
      */
     public function encrypt($text, $appid)
     {
@@ -42,11 +43,9 @@ class Prpcrypt
 
             $iv = substr($this->key, 0, 16);
 
-            $encrypted = openssl_encrypt($text, 'AES-256-CBC', substr($this->key, 0, 32), OPENSSL_ZERO_PADDING, $iv);
-
-            return [ErrorCode::$OK, $encrypted];
+            return openssl_encrypt($text, 'AES-256-CBC', substr($this->key, 0, 32), OPENSSL_ZERO_PADDING, $iv);
         } catch (\Exception $e) {
-            return [ErrorCode::$EncryptAESError, null];
+            throw new InvalidDecryptException(ErrorCode::getErrText(ErrorCode::$EncryptAESError), ErrorCode::$EncryptAESError);
         }
     }
 
@@ -55,6 +54,7 @@ class Prpcrypt
      * 
      * @param string $encrypted 需要解密的密文
      * @return array 解密得到的明文
+     * @throws \Lyz\WeChat\Exceptions\InvalidDecryptException
      */
     public function decrypt($encrypted)
     {
@@ -62,21 +62,23 @@ class Prpcrypt
             $iv = substr($this->key, 0, 16);
             $decrypted = openssl_decrypt($encrypted, 'AES-256-CBC', substr($this->key, 0, 32), OPENSSL_ZERO_PADDING, $iv);
         } catch (\Exception $e) {
-            return [ErrorCode::$DecryptAESError, null];
+            throw new InvalidDecryptException(ErrorCode::getErrText(ErrorCode::$DecryptAESError), ErrorCode::$DecryptAESError);
         }
 
         try {
             $pkcEncoder = new PKCS7Encoder();
             $result = $pkcEncoder->decode($decrypted);
             if (strlen($result) < 16) {
-                return [ErrorCode::$DecryptAESError, null];
+                throw new InvalidDecryptException(ErrorCode::getErrText(ErrorCode::$DecryptAESError), ErrorCode::$DecryptAESError);
             }
             $content = substr($result, 16, strlen($result));
             $len_list = unpack("N", substr($content, 0, 4));
             $xml_len = $len_list[1];
-            return [0, substr($content, 4, $xml_len), substr($content, $xml_len + 4)];
+            return [substr($content, 4, $xml_len), substr($content, $xml_len + 4)];
+        } catch (\Lyz\WeChat\Exceptions\InvalidDecryptException $e) {
+            throw $e;
         } catch (\Exception $e) {
-            return [ErrorCode::$IllegalBuffer, null];
+            throw new InvalidDecryptException(ErrorCode::getErrText(ErrorCode::$IllegalBuffer), ErrorCode::$IllegalBuffer);
         }
     }
 
