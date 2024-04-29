@@ -4,13 +4,13 @@ include "../vendor/autoload.php";
 include "./AccessTokenDemo.php";
 
 use Lyz\WeChat\Qrcode;
+use Lyz\WeChat\Contracts\accessTokenCache;
 
 try {
     // 配置参数
     $config = include "./config.php";
     $config = $config['wechat'];
-    // 注册代替函数
-    $config['GetAccessTokenCallback'] = [AccessTokenDemo::class, 'getAccessTokenCallback'];
+    $config['accessTokenCache'] = new accessTokenCache();
 
     $qrcode = new Qrcode($config);
     // 获取 ticket
