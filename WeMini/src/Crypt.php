@@ -18,7 +18,8 @@ class Crypt extends BasicWeChat
      * 通过授权码换取手机号
      * 
      * @param string $code 每个code只能使用一次，code的有效期为5min
-     * @return array
+     *  code获取: https://developers.weixin.qq.com/miniprogram/dev/framework/open-ability/getPhoneNumber.html
+     * @return \Lyz\WeMini\Doc\PhoneNumberInfo
      * @throws \Lyz\WeChat\Exceptions\InvalidResponseException
      */
     public function getPhoneNumber($code)
