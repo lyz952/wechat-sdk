@@ -4,10 +4,10 @@ namespace Lyz\WeChat\Contracts;
 
 use Lyz\WeChat\Utils\Curl;
 use Lyz\WeChat\Utils\Tools;
+use Lyz\WeChat\Utils\Cache;
 use Lyz\WeChat\Exceptions\ErrorMsg;
 use Lyz\WeChat\Exceptions\InvalidArgumentException;
 use Lyz\WeChat\Exceptions\InvalidResponseException;
-use Lyz\Utils\Contracts\Cache;
 
 /**
  * Class BasicWeChat
@@ -31,7 +31,7 @@ class BasicWeChat
     protected static $instances;
 
     /**
-     * @var \Lyz\Utils\Contracts\Cache 缓存类
+     * @var \Lyz\WeChat\Utils\Cache 缓存类
      */
     protected $cacheTool;
 

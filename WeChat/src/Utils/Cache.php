@@ -1,6 +1,6 @@
 <?php
 
-namespace Lyz\Utils\Contracts;
+namespace Lyz\WeChat\Utils;
 
 use Lyz\WeChat\Exceptions\LocalCacheException;
 
