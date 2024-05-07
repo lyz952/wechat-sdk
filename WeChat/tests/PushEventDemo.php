@@ -71,10 +71,9 @@ class PushEventDemo
                         break;
                 }
                 break;
-
             case 'text':
                 //文本
-                return $receive->text('发送的文本')->reply([], true);
+                return $receive->text('发送的文本')->reply();
                 break;
             case 'image':
                 //图像
@@ -95,10 +94,9 @@ class PushEventDemo
                 //链接
                 break;
             default:
-                return $receive->text('未知的消息')->reply([], true);
+                return $receive->text('未知的消息')->reply();
                 break;
         }
-
         exit;
     }
 }
