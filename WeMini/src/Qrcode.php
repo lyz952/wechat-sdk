@@ -4,7 +4,7 @@ namespace Lyz\WeMini;
 
 use Lyz\WeChat\Utils\Curl;
 use Lyz\WeChat\Utils\Tools;
-use Lyz\WeChat\contracts\BasicWeChat;
+use Lyz\WeChat\Contracts\BasicWeChat;
 
 /**
  * 微信小程序二维码
@@ -35,7 +35,7 @@ class Qrcode extends BasicWeChat
     public function createMiniScene($scene, $page = '', $width = 430, $autoColor = false, $lineColor = null, $isHyaline = true)
     {
         $url = 'https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=ACCESS_TOKEN';
-        $this->registerApi($url);
+        $this->registerApi($url, __FUNCTION__, func_get_args());
 
         $lineColor = empty($lineColor) ? $this->lineColor : $lineColor;
         $data = [
@@ -63,6 +63,13 @@ class Qrcode extends BasicWeChat
     private function parseResult($result)
     {
         if (is_array($json = json_decode($result, true))) {
+            if (isset($json['errcode']) && in_array($json['errcode'], [
+                '41001', '42001',
+                // '40014', '40001',
+            ])) {
+                if (!empty($this->accessTokenCache)) $this->accessTokenCache::clearToken();
+                return call_user_func_array([$this, $this->currentMethod['method']], $this->currentMethod['arguments']);
+            }
             return Tools::json2arr($result);
         } else {
             return $result;

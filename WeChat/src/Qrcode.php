@@ -2,7 +2,7 @@
 
 namespace Lyz\WeChat;
 
-use Lyz\WeChat\contracts\BasicWeChat;
+use Lyz\WeChat\Contracts\BasicWeChat;
 use Lyz\WeChat\Doc\CreateQrcodeResponse;
 
 /**
@@ -31,7 +31,7 @@ class Qrcode extends BasicWeChat
             永久二维码: 是无过期时间的，但数量较少（目前为最多10万个）。
         */
         $url = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=ACCESS_TOKEN";
-        $this->registerApi($url);
+        $this->registerApi($url, __FUNCTION__, func_get_args());
 
         // 二维码场景类型
         if (is_integer($scene)) {

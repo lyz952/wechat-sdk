@@ -1,13 +1,13 @@
 <?php
 
-namespace Lyz\WeChat\contracts;
+namespace Lyz\WeChat\Contracts;
 
 use ArrayAccess;
 
 /**
  * 数组式访问接口, 提供像访问数组一样访问对象的能力
  * Class DataArray
- * @package Lyz\WeChat\contracts
+ * @package Lyz\WeChat\Contracts
  */
 class DataArray implements ArrayAccess
 {

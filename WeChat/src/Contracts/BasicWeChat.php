@@ -1,28 +1,29 @@
 <?php
 
-namespace Lyz\WeChat\contracts;
+namespace Lyz\WeChat\Contracts;
 
 use Lyz\WeChat\Utils\Curl;
 use Lyz\WeChat\Utils\Tools;
 use Lyz\WeChat\Exceptions\ErrorMsg;
 use Lyz\WeChat\Exceptions\InvalidArgumentException;
 use Lyz\WeChat\Exceptions\InvalidResponseException;
+use Lyz\Utils\Contracts\Cache;
 
 /**
  * Class BasicWeChat
- * @package Lyz\WeChat\contracts
+ * @package Lyz\WeChat\Contracts
  */
 class BasicWeChat
 {
     /**
      * @var string 公众号开发者ID
      */
-    public $appId;
+    protected $appId;
 
     /**
      * @var string 公众号开发者密码
      */
-    public $appSecret;
+    protected $appSecret;
 
     /**
      * @var static 静态缓存
@@ -30,9 +31,14 @@ class BasicWeChat
     protected static $instances;
 
     /**
-     * @var array 注册代替函数 例: [类, 函数名] 如类不是实例化，则函数必须是静态函数
+     * @var \Lyz\Utils\Contracts\Cache 缓存类
      */
-    protected $GetAccessTokenCallback;
+    protected $cacheTool;
+
+    /**
+     * @var array 当前请求方法参数，用于token失效重调 ['method' => '', 'arguments' => []]
+     */
+    protected $currentMethod;
 
     /**
      * 构造函数
@@ -51,23 +57,9 @@ class BasicWeChat
         $this->appId = $options['appId'];
         $this->appSecret = $options['appSecret'];
 
-        if (isset($options['GetAccessTokenCallback']) && Tools::checkCallback($options['GetAccessTokenCallback'])) {
-            $this->GetAccessTokenCallback = $options['GetAccessTokenCallback'];
+        if (isset($options['cacheTool']) && $options['cacheTool'] instanceof Cache) {
+            $this->cacheTool = $options['cacheTool'];
         }
-    }
-
-    /**
-     * 获取当前配置
-     *
-     * @return array
-     */
-    public function getConfig()
-    {
-        return [
-            'appId' => $this->appId,
-            'appSecret' => $this->appSecret,
-            'GetAccessTokenCallback' => $this->GetAccessTokenCallback,
-        ];
     }
 
     /**
@@ -86,13 +78,17 @@ class BasicWeChat
     /**
      * 获取 AccessToken
      *
-     * @return string 新凭证有效时间 7200秒
+     * @return string token(有效时间7200秒)
      * @throws \Lyz\WeChat\Exceptions\InvalidResponseException
      */
     public function getAccessToken()
     {
-        if (!empty($this->GetAccessTokenCallback) && Tools::checkCallback($this->GetAccessTokenCallback)) {
-            return call_user_func_array($this->GetAccessTokenCallback, [$this]);
+        $cacheName = $this->appId . '_access_token';
+        if (!empty($this->cacheTool)) {
+            $access_token = $this->cacheTool->getCache($cacheName);
+            if (!empty($access_token)) {
+                return $access_token;
+            }
         }
 
         /*
@@ -121,18 +117,25 @@ class BasicWeChat
             throw new InvalidResponseException(ErrorMsg::toMessage(ErrorMsg::ERROR_GET_ACCESS_TOKEN), ErrorMsg::ERROR_GET_ACCESS_TOKEN, $result);
         }
 
+        if (!empty($this->cacheTool)) {
+            $this->cacheTool->setCache($cacheName, $result['access_token'], 7000);
+        }
+
         return $result['access_token'];
     }
 
     /**
      * 注册当前请求接口
      * 
-     * @param string $url 接口地址
+     * @param string $url       接口地址
+     * @param string $method    当前接口方法
+     * @param array  $arguments 请求参数
      * @return string
      * @throws \Lyz\WeChat\Exceptions\InvalidResponseException
      */
-    protected function registerApi(&$url)
+    protected function registerApi(&$url, $method, $arguments = [])
     {
+        $this->currentMethod = ['method' => $method, 'arguments' => $arguments];
         $access_token = $this->getAccessToken();
         return $url = str_replace('ACCESS_TOKEN', urlencode($access_token), $url);
     }
@@ -146,8 +149,19 @@ class BasicWeChat
      */
     public function callGetApi($url)
     {
-        $curl = new Curl();
-        return Tools::json2arr($curl->get($url));
+        try {
+            $curl = new Curl();
+            return Tools::json2arr($curl->get($url));
+        } catch (InvalidResponseException $exception) {
+            if (in_array($exception->getCode(), [
+                '40001', '40014', '41001', '42001',
+            ])) {
+                $cacheName = $this->appId . '_access_token';
+                if (!empty($this->cacheTool)) $this->cacheTool->delCache($cacheName);
+                return call_user_func_array([$this, $this->currentMethod['method']], $this->currentMethod['arguments']);
+            }
+            throw $exception;
+        }
     }
 
     /**
@@ -160,8 +174,19 @@ class BasicWeChat
      */
     public function callPostApi($url, $data)
     {
-        $curl = new Curl();
-        $curl->setHeader('Content-Type', 'application/json');
-        return Tools::json2arr($curl->post($url, Tools::arr2json($data)));
+        try {
+            $curl = new Curl();
+            $curl->setHeader('Content-Type', 'application/json');
+            return Tools::json2arr($curl->post($url, $data));
+        } catch (InvalidResponseException $exception) {
+            if (in_array($exception->getCode(), [
+                '40001', '40014', '41001', '42001',
+            ])) {
+                $cacheName = $this->appId . '_access_token';
+                if (!empty($this->cacheTool)) $this->cacheTool->delCache($cacheName);
+                return call_user_func_array([$this, $this->currentMethod['method']], $this->currentMethod['arguments']);
+            }
+            throw $exception;
+        }
     }
 }

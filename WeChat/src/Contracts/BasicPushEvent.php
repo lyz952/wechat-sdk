@@ -1,6 +1,6 @@
 <?php
 
-namespace Lyz\WeChat\contracts;
+namespace Lyz\WeChat\Contracts;
 
 use Lyz\WeChat\Utils\Tools;
 use Lyz\WeChat\Aes\Prpcrypt;
@@ -10,7 +10,7 @@ use Lyz\WeChat\Exceptions\InvalidResponseException;
 /**
  * 微信通知处理基本类
  * Class BasicPushEvent
- * @package Lyz\WeChat\contracts
+ * @package Lyz\WeChat\Contracts
  */
 class BasicPushEvent
 {
@@ -35,7 +35,7 @@ class BasicPushEvent
     public $encodingAESKey;
 
     /**
-     * @var \Lyz\WeChat\contracts\DataArray 公众号的推送请求参数 $_REQUEST
+     * @var \Lyz\WeChat\Contracts\DataArray 公众号的推送请求参数 $_REQUEST
      */
     protected $input;
 
@@ -50,7 +50,7 @@ class BasicPushEvent
     protected $postxml;
 
     /**
-     * @var \Lyz\WeChat\contracts\DataArray 公众号推送内容对象
+     * @var \Lyz\WeChat\Contracts\DataArray 公众号推送内容对象
      */
     protected $receive;
 

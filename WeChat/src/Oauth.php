@@ -2,7 +2,7 @@
 
 namespace Lyz\WeChat;
 
-use Lyz\WeChat\contracts\BasicWeChat;
+use Lyz\WeChat\Contracts\BasicWeChat;
 
 /**
  * 微信网页授权
