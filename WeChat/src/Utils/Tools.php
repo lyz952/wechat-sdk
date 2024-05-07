@@ -95,14 +95,18 @@ class Tools
     }
 
     /**
-     * 检查回调函数是否有用
+     * 产生随机字符串
      * 
-     * @param array $callback [类, 静态函数名]
-     * @return boolean
+     * @param int    $length 指定字符长度
+     * @param string $str 字符串前缀
+     * @return string
      */
-    public static function checkCallback($callback)
+    public static function createNoncestr($length = 32, $str = "")
     {
-        if (is_array($callback) && is_callable($callback, true, $callable_name)) return true;
-        return false;
+        $chars = "abcdefghijklmnopqrstuvwxyz0123456789";
+        for ($i = 0; $i < $length; $i++) {
+            $str .= substr($chars, mt_rand(0, strlen($chars) - 1), 1);
+        }
+        return $str;
     }
 }

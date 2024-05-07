@@ -4,10 +4,10 @@ namespace Lyz\WeChat\Contracts;
 
 use Lyz\WeChat\Utils\Curl;
 use Lyz\WeChat\Utils\Tools;
-use Lyz\WeChat\Contracts\accessTokenCache;
 use Lyz\WeChat\Exceptions\ErrorMsg;
 use Lyz\WeChat\Exceptions\InvalidArgumentException;
 use Lyz\WeChat\Exceptions\InvalidResponseException;
+use Lyz\Utils\Contracts\Cache;
 
 /**
  * Class BasicWeChat
@@ -18,12 +18,12 @@ class BasicWeChat
     /**
      * @var string 公众号开发者ID
      */
-    public $appId;
+    protected $appId;
 
     /**
      * @var string 公众号开发者密码
      */
-    public $appSecret;
+    protected $appSecret;
 
     /**
      * @var static 静态缓存
@@ -31,9 +31,9 @@ class BasicWeChat
     protected static $instances;
 
     /**
-     * @var \Lyz\WeChat\Contracts\accessTokenCache token缓存类
+     * @var \Lyz\Utils\Contracts\Cache 缓存类
      */
-    protected $accessTokenCache;
+    protected $cacheTool;
 
     /**
      * @var array 当前请求方法参数，用于token失效重调 ['method' => '', 'arguments' => []]
@@ -57,8 +57,8 @@ class BasicWeChat
         $this->appId = $options['appId'];
         $this->appSecret = $options['appSecret'];
 
-        if (isset($options['accessTokenCache']) && $options['accessTokenCache'] instanceof accessTokenCache) {
-            $this->accessTokenCache = $options['accessTokenCache'];
+        if (isset($options['cacheTool']) && $options['cacheTool'] instanceof Cache) {
+            $this->cacheTool = $options['cacheTool'];
         }
     }
 
@@ -83,8 +83,9 @@ class BasicWeChat
      */
     public function getAccessToken()
     {
-        if (!empty($this->accessTokenCache)) {
-            $access_token = $this->accessTokenCache::getToken();
+        $cacheName = $this->appId . '_access_token';
+        if (!empty($this->cacheTool)) {
+            $access_token = $this->cacheTool->getCache($cacheName);
             if (!empty($access_token)) {
                 return $access_token;
             }
@@ -116,8 +117,8 @@ class BasicWeChat
             throw new InvalidResponseException(ErrorMsg::toMessage(ErrorMsg::ERROR_GET_ACCESS_TOKEN), ErrorMsg::ERROR_GET_ACCESS_TOKEN, $result);
         }
 
-        if (!empty($this->accessTokenCache)) {
-            $this->accessTokenCache::setToken($result['access_token']);
+        if (!empty($this->cacheTool)) {
+            $this->cacheTool->setCache($cacheName, $result['access_token'], 7000);
         }
 
         return $result['access_token'];
@@ -153,10 +154,10 @@ class BasicWeChat
             return Tools::json2arr($curl->get($url));
         } catch (InvalidResponseException $exception) {
             if (in_array($exception->getCode(), [
-                '41001', '42001',
-                // '40014', '40001',
+                '40001', '40014', '41001', '42001',
             ])) {
-                if (!empty($this->accessTokenCache)) $this->accessTokenCache::clearToken();
+                $cacheName = $this->appId . '_access_token';
+                if (!empty($this->cacheTool)) $this->cacheTool->delCache($cacheName);
                 return call_user_func_array([$this, $this->currentMethod['method']], $this->currentMethod['arguments']);
             }
             throw $exception;
@@ -179,10 +180,10 @@ class BasicWeChat
             return Tools::json2arr($curl->post($url, $data));
         } catch (InvalidResponseException $exception) {
             if (in_array($exception->getCode(), [
-                '41001', '42001',
-                // '40014', '40001',
+                '40001', '40014', '41001', '42001',
             ])) {
-                if (!empty($this->accessTokenCache)) $this->accessTokenCache::clearToken();
+                $cacheName = $this->appId . '_access_token';
+                if (!empty($this->cacheTool)) $this->cacheTool->delCache($cacheName);
                 return call_user_func_array([$this, $this->currentMethod['method']], $this->currentMethod['arguments']);
             }
             throw $exception;
