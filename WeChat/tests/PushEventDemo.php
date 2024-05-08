@@ -71,7 +71,6 @@ class PushEventDemo
                         break;
                 }
                 break;
-
             case 'text':
                 //文本
                 return $receive->text('发送的文本')->reply([], true);
@@ -98,7 +97,6 @@ class PushEventDemo
                 return $receive->text('未知的消息')->reply([], true);
                 break;
         }
-
         exit;
     }
 }
