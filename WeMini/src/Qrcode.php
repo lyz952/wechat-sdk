@@ -50,7 +50,7 @@ class Qrcode extends BasicWeChat
         ];
         if (empty($page)) unset($data['page']);
 
-        return $this->parseResult((new Curl())->post($url, Tools::arr2json($data)));
+        return $this->parseResult((new Curl())->post($url, $data));
     }
 
     /**
@@ -64,10 +64,10 @@ class Qrcode extends BasicWeChat
     {
         if (is_array($json = json_decode($result, true))) {
             if (isset($json['errcode']) && in_array($json['errcode'], [
-                '41001', '42001',
-                // '40014', '40001',
+                '40001', '40014', '41001', '42001',
             ])) {
-                if (!empty($this->accessTokenCache)) $this->accessTokenCache::clearToken();
+                $cacheName = $this->appId . '_access_token';
+                if (!empty($this->cacheTool)) $this->cacheTool->delCache($cacheName);
                 return call_user_func_array([$this, $this->currentMethod['method']], $this->currentMethod['arguments']);
             }
             return Tools::json2arr($result);
