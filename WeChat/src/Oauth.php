@@ -61,4 +61,19 @@ class Oauth extends BasicWeChat
         $url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={$this->appId}&secret={$this->appSecret}&code={$code}&grant_type=authorization_code";
         return $this->callGetApi($url);
     }
+
+    /**
+     * 拉取用户信息(需scope为 snsapi_userinfo)
+     * 
+     * @param string $accessToken 网页授权接口调用凭证,注意：此access_token与基础支持的access_token不同
+     * @param string $openid      用户的唯一标识
+     * @param string $lang        返回国家地区语言版本，zh_CN 简体，zh_TW 繁体，en 英语
+     * @return array
+     * @throws \Lyz\WeChat\Exceptions\InvalidResponseException
+     */
+    public function getUserInfo($accessToken, $openid, $lang = 'zh_CN')
+    {
+        $url = "https://api.weixin.qq.com/sns/userinfo?access_token={$accessToken}&openid={$openid}&lang={$lang}";
+        return $this->callGetApi($url);
+    }
 }
